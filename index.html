@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- ── PWA Core ──────────────────────────────────────────── -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#00D4AA" />
+
+    <!-- ── Viewport — no zoom, full screen on mobile ─────────── -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,
+          maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
+    <!-- ── Android / Chrome PWA ──────────────────────────────── -->
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- ── iOS / Safari PWA ──────────────────────────────────── -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="TradeLog" />
+
+    <!-- ── Apple Touch Icons ─────────────────────────────────── -->
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144.png" />
+
+    <!-- ── Favicon ───────────────────────────────────────────── -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- ── SEO / Social ──────────────────────────────────────── -->
+    <meta name="description" content="Track, analyse and improve your NSE/BSE intraday trades — free mobile trading journal" />
+    <meta name="application-name" content="TradeLog" />
+
+    <!-- ── Fonts ─────────────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet" />
+
+    <title>TradeLog — Intraday Journal</title>
+
+    <!-- ── Splash background while app loads ────────────────── -->
+    <style>
+      body { margin: 0; background: #090B0F; }
+      #splash {
+        position: fixed; inset: 0; z-index: 9999;
+        background: #090B0F;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        transition: opacity 0.4s ease;
+      }
+      #splash.hide { opacity: 0; pointer-events: none; }
+      .splash-icon {
+        width: 80px; height: 80px; border-radius: 20px;
+        background: rgba(0,212,170,0.12);
+        border: 2px solid rgba(0,212,170,0.35);
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 20px;
+      }
+      .splash-icon svg { width: 44px; height: 44px; }
+      .splash-title {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 22px; font-weight: 700;
+        color: #F0F4FF; letter-spacing: -0.02em;
+        margin-bottom: 6px;
+      }
+      .splash-sub {
+        font-family: 'Inter', -apple-system, sans-serif;
+        font-size: 12px; color: #4A5568;
+        letter-spacing: 0.1em; text-transform: uppercase;
+      }
+      .splash-dot {
+        width: 6px; height: 6px; border-radius: 3px;
+        background: #00D4AA; margin-top: 28px;
+        animation: pulse-dot 1.2s ease-in-out infinite;
+      }
+      @keyframes pulse-dot {
+        0%,100% { opacity: 0.3; transform: scale(0.8); }
+        50%      { opacity: 1;   transform: scale(1.2); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Splash screen (hidden once React mounts) -->
+    <div id="splash">
+      <div class="splash-icon">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polyline points="4,34 12,22 20,28 30,14 40,20"
+            stroke="#00D4AA" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="40" cy="20" r="3" fill="#00D4AA"/>
+        </svg>
+      </div>
+      <div class="splash-title">TradeLog</div>
+      <div class="splash-sub">Intraday Journal</div>
+      <div class="splash-dot"></div>
+    </div>
+
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- ── Service Worker Registration ───────────────────────── -->
+    <script>
+      // Hide splash once React has painted
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          const splash = document.getElementById('splash');
+          if (splash) {
+            splash.classList.add('hide');
+            setTimeout(() => splash.remove(), 450);
+          }
+        }, 300);
+      });
+
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js', { scope: '/' })
+            .then(reg => {
+              console.log('[PWA] Service Worker registered:', reg.scope);
+            })
+            .catch(err => {
+              console.warn('[PWA] Service Worker registration failed:', err);
+            });
+        });
+      }
+    </script>
+  </body>
+</html>
